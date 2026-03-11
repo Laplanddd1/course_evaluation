@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}教师仪表盘{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-5 fw-bold text-success">您好，{{ teacher.name }}老师！</h1>
+            <p class="lead text-muted">工号：{{ teacher.teacher_id }}</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 教师排行榜 -->
+        <div class="col-md-12">
+            <div class="card shadow-sm border-warning mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-warning mb-1"><i class="fas fa-crown me-2"></i>最受欢迎教师排行榜</h5>
+                        <p class="card-text text-muted mb-0">查看全校教师人气排名情况。</p>
+                    </div>
+                    <a href="{% url 'teacher_leaderboard' %}" class="btn btn-warning text-dark">
+                        <i class="fas fa-chart-line me-1"></i>查看榜单
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 授课列表 -->
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 py-3">
+                    <h4 class="mb-0"><i class="fas fa-chalkboard-teacher text-success me-2"></i>我的授课</h4>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>课程代码</th>
+                                        <th>课程名称</th>
+                                        <th>学期</th>
+                                        <th>选课人数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in courses %}
+                                    <tr>
+                                        <td>{{ course.course_code }}</td>
+                                        <td class="fw-bold">{{ course.course_name }}</td>
+                                        <td>{{ course.semester }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary rounded-pill">
+                                                {{ course.students.count }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                             <div class="btn-group btn-group-sm">
+                                                 <a href="{% url 'course_grading' course.id %}" class="btn btn-outline-primary">
+                                                     <i class="fas fa-edit me-1"></i>录入成绩
+                                                 </a>
+                                                 <a href="{% url 'course_results' course.id %}" class="btn btn-outline-success">
+                                                     <i class="fas fa-chart-bar me-1"></i>查看评价
+                                                 </a>
+                                             </div>
+                                         </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-book-open fa-3x mb-3 opacity-50"></i>
+                            <p>暂无授课记录。</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 个人设置 -->
+        <div class="col-md-12">
+            <div class="text-end">
+                <a href="{% url 'profile_settings' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-cog me-1"></i>账号设置
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

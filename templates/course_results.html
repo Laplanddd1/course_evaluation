@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}课程评价结果 - {{ course.course_name }}{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-primary">{{ course.course_name }} <small class="text-muted h5">({{ course.course_code }})</small></h2>
+            <p class="text-muted mb-0">学期: {{ course.semester }} | 评价结果分析</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>返回仪表盘
+        </a>
+    </div>
+
+    {% if results_data %}
+        {% for data in results_data %}
+            <div class="card shadow-sm mb-5">
+                <div class="card-header bg-light py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-poll me-2"></i>{{ data.task.name }}</h4>
+                        <span class="badge bg-primary rounded-pill">收到 {{ data.count }} 份评价</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if data.question_stats %}
+                        {% for stat in data.question_stats %}
+                            <div class="mb-5 border-bottom pb-4 last-no-border">
+                                <h5 class="fw-bold mb-3">
+                                    <span class="badge bg-secondary me-2">Q{{ forloop.counter }}</span>
+                                    {{ stat.question.content }}
+                                    <small class="text-muted fw-normal">({{ stat.question.get_question_type_display }})</small>
+                                </h5>
+
+                                {% if stat.type == 'chart' %}
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8 col-lg-6">
+                                            <canvas id="{{ stat.chart_id }}"></canvas>
+                                        </div>
+                                    </div>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            var ctx = document.getElementById('{{ stat.chart_id }}').getContext('2d');
+                                            new Chart(ctx, {
+                                                type: 'bar',
+                                                data: {
+                                                    labels: {{ stat.labels_json|safe }},
+                                                    datasets: [{
+                                                        label: '选择人数',
+                                                        data: {{ stat.data_json|safe }},
+                                                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                                        borderWidth: 1
+                                                    }]
+                                                },
+                                                options: {
+                                                    responsive: true,
+                                                    scales: {
+                                                        y: {
+                                                            beginAtZero: true,
+                                                            ticks: {
+                                                                stepSize: 1
+                                                            }
+                                                        }
+                                                    },
+                                                    plugins: {
+                                                        legend: {
+                                                            display: false
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    </script>
+                                {% elif stat.type == 'text' %}
+                                    <div class="bg-light p-3 rounded">
+                                        {% if stat.feedbacks %}
+                                            <ul class="list-group list-group-flush bg-transparent">
+                                                {% for feedback in stat.feedbacks %}
+                                                    <li class="list-group-item bg-transparent border-bottom">
+                                                        <i class="fas fa-quote-left text-muted me-2"></i> {{ feedback }}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="text-muted mb-0 fst-italic">暂无文本反馈。</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">暂无问题统计数据。</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+            <h4>暂无评价数据</h4>
+            <p>该课程尚未发布评价任务，或暂无学生提交评价。</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .last-no-border:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}我的成绩{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-primary"><i class="fas fa-graduation-cap me-2"></i>我的成绩</h2>
+            <p class="text-muted mb-0">
+                {% if current_semester %}{{ current_semester }} 学期{% else %}所有学期{% endif %}
+            </p>
+        </div>
+        <div class="d-flex align-items-center">
+                <form class="d-flex me-2" method="get">
+                    <select name="semester" class="form-select" onchange="this.form.submit()">
+                        <option value="">全部学期</option>
+                        {% for sem in semesters %}
+                            <option value="{{ sem }}" {% if current_semester == sem %}selected{% endif %}>{{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <a href="?semester={{ current_semester|default:'' }}&export=true" class="btn btn-outline-success me-2 text-nowrap">
+                    <i class="fas fa-file-export me-1"></i>导出
+                </a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary text-nowrap">
+                    <i class="fas fa-arrow-left me-1"></i>返回
+                </a>
+            </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if grade_data %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>课程代码</th>
+                                <th>课程名称</th>
+                                <th>学分</th>
+                                <th>平时成绩</th>
+                                <th>期末成绩</th>
+                                <th>总评成绩</th>
+                                <th>绩点</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in grade_data %}
+                            <tr>
+                                <td>{{ item.course.course_code }}</td>
+                                <td class="fw-bold">{{ item.course.course_name }}</td>
+                                <td>{{ item.course.credit|default:"-" }}</td>
+                                <td>
+                                    {% if item.score %}
+                                        {{ item.score.regular_score|default:"-" }}
+                                        <small class="text-muted">({{ item.course.regular_weight|floatformat:1 }})</small>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.score %}
+                                        {{ item.score.final_score|default:"-" }}
+                                        <small class="text-muted">({{ item.course.final_weight|floatformat:1 }})</small>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.score and item.score.total_score %}
+                                        <span class="fw-bold {% if item.score.total_score < 60 %}text-danger{% else %}text-success{% endif %}">
+                                            {{ item.score.total_score }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">暂无</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.score and item.score.total_score %}
+                                        {% if item.score.total_score >= 90 %}4.0
+                                        {% elif item.score.total_score >= 85 %}3.7
+                                        {% elif item.score.total_score >= 82 %}3.3
+                                        {% elif item.score.total_score >= 78 %}3.0
+                                        {% elif item.score.total_score >= 75 %}2.7
+                                        {% elif item.score.total_score >= 72 %}2.3
+                                        {% elif item.score.total_score >= 68 %}2.0
+                                        {% elif item.score.total_score >= 64 %}1.5
+                                        {% elif item.score.total_score >= 60 %}1.0
+                                        {% else %}0.0
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-5">暂无选课记录。</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}学生仪表盘{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-5 fw-bold text-primary">你好，{{ student.name }}同学！</h1>
+            <p class="lead text-muted">学号：{{ student.student_id }}</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 待评价课程卡片 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">课程评价任务</h5>
+                    <p class="card-text">查看当前学期所有待完成的课程评价问卷。</p>
+                    <a href="{% url 'student_tasks' %}" class="btn btn-primary stretched-link">
+                        前往评价 <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的课程 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">我的课程</h5>
+                    <p class="card-text">已选修 {{ student.courses.count }} 门课程。</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'select_courses' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus-circle me-1"></i>去选课
+                        </a>
+                        <a href="{% url 'student_schedule' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-calendar-alt me-1"></i>查看课表
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的成绩 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-graduation-cap fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">我的成绩</h5>
+                    <p class="card-text">查看本学期课程成绩。</p>
+                    <a href="{% url 'my_grades' %}" class="btn btn-info text-white stretched-link">
+                        <i class="fas fa-eye me-1"></i>查看成绩
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 教师排行榜 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">最受欢迎教师</h5>
+                    <p class="card-text">为你喜欢的老师投票！</p>
+                    <a href="{% url 'teacher_leaderboard' %}" class="btn btn-warning text-dark stretched-link">
+                        <i class="fas fa-vote-yea me-1"></i>去投票
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史评价 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-history fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">历史评价</h5>
+                    <p class="card-text">查看你过去提交的评价记录。</p>
+                    <a href="{% url 'historical_evaluations' %}" class="btn btn-outline-secondary stretched-link">
+                        <i class="fas fa-clock me-1"></i>查看记录
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人中心 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-cog fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">个人中心</h5>
+                    <p class="card-text">修改密码或更新个人信息。</p>
+                    <a href="{% url 'profile_settings' %}" class="btn btn-outline-secondary stretched-link">
+                        <i class="fas fa-cog me-1"></i>进入设置
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

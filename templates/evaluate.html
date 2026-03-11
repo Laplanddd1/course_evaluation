@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}课程评价 - {{ task.course.course_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white p-4">
+                    <h3 class="mb-0">{{ task.course.course_name }}</h3>
+                    <p class="mb-0 mt-2 opacity-75">
+                        <i class="fas fa-tasks me-1"></i> {{ task.name }}
+                    </p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <div class="alert alert-light border-start border-4 border-info mb-4" role="alert">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>评价须知</h5>
+                        <p class="mb-0 text-muted small">
+                            请客观、公正地对课程进行评价。所有评价结果将匿名处理（如果选择了匿名），仅供改进教学使用。
+                        </p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-4">
+                                {% if field.name == 'anonymous' %}
+                                    <div class="form-check form-switch mt-4 pt-3 border-top">
+                                        {{ field }}
+                                        <label class="form-check-label fw-bold" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+                                        <div class="form-text">开启后，教师只能看到评价内容，无法看到您的姓名。</div>
+                                    </div>
+                                {% else %}
+                                    <div class="card mb-3 border-0 bg-light">
+                                        <div class="card-body">
+                                            <label class="form-label fw-bold mb-2 d-block">
+                                                <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                                                {{ field.label }}
+                                            </label>
+                                            <div class="ps-4">
+                                                {{ field }}
+                                                {% if field.help_text %}
+                                                    <div class="form-text text-muted">{{ field.help_text }}</div>
+                                                {% endif %}
+                                                {% if field.errors %}
+                                                    <div class="text-danger small mt-1">
+                                                        {{ field.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>提交评价
+                            </button>
+                            <a href="{% url 'student_tasks' %}" class="btn btn-outline-secondary">
+                                取消
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 自定义表单样式，配合 Bootstrap */
+    ul { list-style: none; padding-left: 0; }
+    /* 单选框和多选框样式优化 */
+    ul li { margin-bottom: 0.5rem; }
+    input[type="radio"], input[type="checkbox"] { margin-right: 0.5rem; }
+    /* 文本域样式 */
+    textarea { width: 100%; border: 1px solid #ced4da; border-radius: 0.25rem; padding: 0.5rem; }
+    textarea:focus { outline: none; border-color: #86b7fe; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+</style>
+{% endblock %}

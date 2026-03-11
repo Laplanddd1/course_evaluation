@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}我的课表{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-primary"><i class="fas fa-calendar-alt me-2"></i>我的课表</h2>
+            <p class="text-muted mb-0">2025-2026-1 学期</p>
+        </div>
+        <div>
+            <a href="javascript:window.print()" class="btn btn-outline-primary me-2">
+                <i class="fas fa-print me-1"></i>打印
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>返回
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 15%">节次 / 星期</th>
+                            {% for day_num, day_name in week_days %}
+                                <th style="width: 12%">{{ day_name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in schedule_rows %}
+                            <tr>
+                                <td class="bg-light fw-bold text-muted small">{{ row.slot_name }}</td>
+                                {% for course in row.courses %}
+                                    <td class="p-1">
+                                        {% if course %}
+                                            <div class="card bg-info bg-opacity-10 border-info h-100 py-2">
+                                                <div class="card-body p-1">
+                                                    <div class="fw-bold text-primary small">{{ course.course_name }}</div>
+                                                    <div class="text-muted small" style="font-size: 0.75rem;">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>{{ course.location }}
+                                                    </div>
+                                                    <div class="text-muted small" style="font-size: 0.75rem;">
+                                                        {% for teacher in course.teachers.all %}
+                                                            {{ teacher.name }}{% if not forloop.last %}、{% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .container, .container * {
+            visibility: visible;
+        }
+        .container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .btn {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

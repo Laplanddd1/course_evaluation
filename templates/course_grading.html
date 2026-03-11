@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}成绩录入 - {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-primary">{{ course.course_name }} <small class="text-muted h5">成绩录入</small></h2>
+            <p class="text-muted mb-0">课程代码: {{ course.course_code }} | 选课人数: {{ student_data|length }}</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>返回仪表盘
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- 权重设置 -->
+                <div class="row mb-4 align-items-end bg-light p-3 rounded">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">平时分权重 (0-1)</label>
+                        <input type="number" step="0.1" min="0" max="1" name="regular_weight" class="form-control" value="{{ course.regular_weight }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">期末分权重 (0-1)</label>
+                        <input type="number" step="0.1" min="0" max="1" name="final_weight" class="form-control" value="{{ course.final_weight }}">
+                    </div>
+                    <div class="col-md-4 text-muted small">
+                        <i class="fas fa-info-circle me-1"></i> 修改权重后点击下方保存按钮，系统将自动重新计算所有学生的总评成绩。
+                    </div>
+                </div>
+
+                <!-- 学生列表 -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th style="width: 150px;">平时成绩</th>
+                                <th style="width: 150px;">期末成绩</th>
+                                <th>总评成绩</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in student_data %}
+                            <tr>
+                                <td>{{ item.student.student_id }}</td>
+                                <td>{{ item.student.name }}</td>
+                                <td>
+                                    <input type="number" step="0.5" min="0" max="100" 
+                                           name="regular_{{ item.student.student_id }}" 
+                                           class="form-control form-control-sm"
+                                           value="{{ item.score.regular_score|default:'' }}"
+                                           placeholder="未录入">
+                                </td>
+                                <td>
+                                    <input type="number" step="0.5" min="0" max="100" 
+                                           name="final_{{ item.student.student_id }}" 
+                                           class="form-control form-control-sm"
+                                           value="{{ item.score.final_score|default:'' }}"
+                                           placeholder="未录入">
+                                </td>
+                                <td>
+                                    {% if item.score.total_score %}
+                                        <span class="fw-bold {% if item.score.total_score < 60 %}text-danger{% else %}text-success{% endif %}">
+                                            {{ item.score.total_score }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>保存成绩
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

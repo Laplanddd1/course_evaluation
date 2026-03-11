@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}历史评价记录{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-primary"><i class="fas fa-history me-2"></i>历史评价记录</h2>
+            <p class="text-muted mb-0">查看你过去提交的所有评价</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>返回仪表盘
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if results %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>提交时间</th>
+                                <th>课程名称</th>
+                                <th>评价任务</th>
+                                <th>授课教师</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <td>{{ result.submit_time|date:"Y-m-d H:i" }}</td>
+                                <td class="fw-bold">{{ result.task.course.course_name }}</td>
+                                <td>{{ result.task.name }}</td>
+                                <td>
+                                    {% for teacher in result.task.course.teachers.all %}
+                                        {{ teacher.name }}{% if not forloop.last %}、{% endif %}
+                                    {% empty %}
+                                        暂无教师
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>已提交
+                                    </span>
+                                    {% if result.is_anonymous %}
+                                        <span class="badge bg-secondary ms-1">匿名</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3 opacity-50"></i>
+                    <p class="text-muted">你还没有提交过任何评价。</p>
+                    <a href="{% url 'student_tasks' %}" class="btn btn-primary">
+                        <i class="fas fa-tasks me-1"></i>去评价
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
