@@ -35,10 +35,13 @@ pip install -r requirements.txt
 
 ### 2. 配置环境变量（可选但推荐）
 
-将 `.env.example` 复制为 `.env`，并按需修改：
+项目使用环境变量读取 `DJANGO_SECRET_KEY` 与 `DJANGO_DEBUG`。仓库中提供了 `.env.example` 作为参考，但默认不会自动加载 `.env` 文件，你可以在启动前手动设置环境变量。
 
-```bash
-copy .env.example .env
+PowerShell 示例：
+
+```powershell
+$env:DJANGO_SECRET_KEY="change-me"
+$env:DJANGO_DEBUG="true"
 ```
 
 ### 3. 数据库迁移与启动
@@ -78,4 +81,3 @@ python manage.py populate_data
 ## 注意事项
 
 - 默认使用 SQLite，本地开发无需额外安装数据库。
-- 请勿将 `.env`、`db.sqlite3` 等敏感/本地文件提交到公开仓库。
