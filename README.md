@@ -81,3 +81,106 @@ python manage.py populate_data
 ## 注意事项
 
 - 默认使用 SQLite，本地开发无需额外安装数据库。
+- 请勿将 `.env`、`db.sqlite3` 等敏感/本地文件提交到公开仓库（已在 `.gitignore` 中忽略）。
+
+## 连接到你自己的 MySQL
+
+项目已内置 MySQL 支持，通过环境变量切换：
+
+- `DB_ENGINE`：`sqlite` 或 `mysql`（默认 sqlite）
+- `DB_NAME`：数据库名（如 `course_evaluation`）
+- `DB_USER`：数据库用户名（如 `ce_user`）
+- `DB_PASSWORD`：数据库密码
+- `DB_HOST`：主机（默认 `127.0.0.1`）
+- `DB_PORT`：端口（默认 `3306`，自定义端口如 `3308` 请显式设置）
+
+> 项目不会自动加载 `.env`，请在终端设置环境变量或在部署环境中配置。
+
+### Windows PowerShell 示例
+
+```powershell
+$env:DB_ENGINE="mysql"
+$env:DB_NAME="course_evaluation"
+$env:DB_USER="ce_user"
+$env:DB_PASSWORD="123456"
+$env:DB_HOST="127.0.0.1"
+$env:DB_PORT="3308"  # 若为默认3306可省略
+
+python manage.py migrate
+python manage.py runserver
+```
+
+### Linux/macOS 示例
+
+```bash
+export DB_ENGINE=mysql
+export DB_NAME=course_evaluation
+export DB_USER=ce_user
+export DB_PASSWORD=123456
+export DB_HOST=127.0.0.1
+export DB_PORT=3308
+
+python manage.py migrate
+python manage.py runserver
+```
+
+### 初始化 MySQL（只需一次）
+
+```sql
+CREATE DATABASE IF NOT EXISTS course_evaluation
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'ce_user'@'%' IDENTIFIED BY '123456';
+GRANT ALL PRIVILEGES ON course_evaluation.* TO 'ce_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+## 从 SQLite 迁移数据到 MySQL（可选）
+
+1. 使用 SQLite 导出数据（使用 `--output` 确保 UTF‑8）：
+   ```powershell
+   $env:DB_ENGINE="sqlite"
+   python manage.py dumpdata --exclude contenttypes --exclude auth.permission --indent 2 --output data.json
+   ```
+2. 切换 MySQL 并迁移表结构：
+   ```powershell
+   $env:DB_ENGINE="mysql"
+   $env:DB_NAME="course_evaluation"
+   $env:DB_USER="ce_user"
+   $env:DB_PASSWORD="123456"
+   $env:DB_HOST="127.0.0.1"
+   $env:DB_PORT="3308"
+   python manage.py migrate
+   ```
+3. 导入数据：
+   ```powershell
+   python manage.py loaddata data.json
+   ```
+
+如遇 `loaddata` UTF‑8 解码错误，可先转换为 UTF‑8 再导入：
+
+```powershell
+python - <<'PY'
+import pathlib, json, sys
+p = pathlib.Path('data.json'); b = p.read_bytes()
+for enc in ('utf-8','utf-8-sig','utf-16','utf-16le','utf-16be','gbk','cp936','latin1'):
+    try:
+        s = b.decode(enc); obj = json.loads(s)
+        pathlib.Path('data_utf8.json').write_text(json.dumps(obj, ensure_ascii=False, indent=2), encoding='utf-8')
+        print('detected', enc); sys.exit(0)
+    except Exception: pass
+print('failed: unknown encoding', file=sys.stderr); sys.exit(1)
+PY
+python manage.py loaddata data_utf8.json
+```
+
+## 是否需要提交数据库文件？
+
+不建议把数据库文件（如 `db.sqlite3` 或 MySQL 的数据备份）提交到仓库：
+- 可能包含敏感数据；
+- 文件体积大且不可复现。
+
+推荐做法：
+- 使用 `dumpdata/loaddata` 管理**无敏感信息**的初始化数据（fixtures）；
+- 或使用 `python manage.py populate_data` 生成演示数据。
