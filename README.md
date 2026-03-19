@@ -175,12 +175,4 @@ PY
 python manage.py loaddata data_utf8.json
 ```
 
-## 是否需要提交数据库文件？
 
-不建议把数据库文件（如 `db.sqlite3` 或 MySQL 的数据备份）提交到仓库：
-- 可能包含敏感数据；
-- 文件体积大且不可复现。
-
-推荐做法：
-- 使用 `dumpdata/loaddata` 管理**无敏感信息**的初始化数据（fixtures）；
-- 或使用 `python manage.py populate_data` 生成演示数据。
