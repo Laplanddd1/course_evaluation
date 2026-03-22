@@ -81,18 +81,17 @@ python manage.py populate_data
 ## 注意事项
 
 - 默认使用 SQLite，本地开发无需额外安装数据库。
-- 请勿将 `.env`、`db.sqlite3` 等敏感/本地文件提交到公开仓库（已在 `.gitignore` 中忽略）。
+
 
 ## 连接到你自己的 MySQL
 
-项目已内置 MySQL 支持，通过环境变量切换：
-
+通过环境变量切换：
 - `DB_ENGINE`：`sqlite` 或 `mysql`（默认 sqlite）
 - `DB_NAME`：数据库名（如 `course_evaluation`）
 - `DB_USER`：数据库用户名（如 `ce_user`）
 - `DB_PASSWORD`：数据库密码
 - `DB_HOST`：主机（默认 `127.0.0.1`）
-- `DB_PORT`：端口（默认 `3306`，自定义端口如 `3308` 请显式设置）
+- `DB_PORT`：端口（一般默认 `3306`）
 
 > 项目不会自动加载 `.env`，请在终端设置环境变量或在部署环境中配置。
 
@@ -136,13 +135,15 @@ GRANT ALL PRIVILEGES ON course_evaluation.* TO 'ce_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-## 从 SQLite 迁移数据到 MySQL（可选）
+## 从 SQLite 迁移数据到 MySQL
 
 1. 使用 SQLite 导出数据（使用 `--output` 确保 UTF‑8）：
    ```powershell
    $env:DB_ENGINE="sqlite"
    python manage.py dumpdata --exclude contenttypes --exclude auth.permission --indent 2 --output data.json
    ```
+
+
 2. 切换 MySQL 并迁移表结构：
    ```powershell
    $env:DB_ENGINE="mysql"
@@ -158,7 +159,7 @@ FLUSH PRIVILEGES;
    python manage.py loaddata data.json
    ```
 
-如遇 `loaddata` UTF‑8 解码错误，可先转换为 UTF‑8 再导入：
+如果 `loaddata` UTF‑8 解码错误，先转换为 UTF‑8 再导入。
 
 ```powershell
 python - <<'PY'
@@ -174,5 +175,3 @@ print('failed: unknown encoding', file=sys.stderr); sys.exit(1)
 PY
 python manage.py loaddata data_utf8.json
 ```
-
-

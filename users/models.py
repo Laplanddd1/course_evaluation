@@ -64,3 +64,20 @@ class Admin(models.Model):
 
     def __str__(self):
         return f'管理员 {self.user.username}'
+
+
+class SiteSetting(models.Model):
+    registration_enabled = models.BooleanField(default=True, verbose_name='允许注册')
+
+    class Meta:
+        db_table = 'site_setting'
+        verbose_name = '站点设置'
+        verbose_name_plural = '站点设置'
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return '站点设置'

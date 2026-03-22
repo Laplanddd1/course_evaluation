@@ -24,7 +24,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-change-me")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()] or ["127.0.0.1", "localhost"]
+
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
 
 
 # Application definition
@@ -82,10 +84,10 @@ if DB_ENGINE == "mysql":
         "default": {
             "ENGINE": "django.db.backends.mysql",
             "NAME": os.getenv("DB_NAME", "course_evaluation"),
-            "USER": os.getenv("DB_USER", "root"),
-            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "USER": os.getenv("DB_USER", "ce_user"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "123456"),
             "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-            "PORT": os.getenv("DB_PORT", "3306"),
+            "PORT": os.getenv("DB_PORT", "3308"),
             "OPTIONS": {
                 "charset": "utf8mb4",
             },
